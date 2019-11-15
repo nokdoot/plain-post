@@ -1,5 +1,8 @@
 package Lexer;
 
+use feature qw/ say /;
+use Data::Dumper;
+
 use base "Exporter";
 @EXPORT_OK = qw/ 
     make_charstream 
@@ -34,18 +37,33 @@ sub records {
 }
 
 sub tokens {
-    my $target = shift;
-    return sub {
-        TOKEN: {
-            return ['integer', $1] if $target =~ /\G (\d+)/gcx;
-            return ['print'] if $target =~ /\G print \b/gcx;
-            return ['identifier', $1] if $target =~ /\G ([A-Za-z_]\w*)/gcx;
-            return ['operator', $1] if $target =~ /\G (\*\*)/gcx;
-            return ['operator', $1] if $target =~ /\G ([-+*\/=()])/gcx;
-            return ['terminator', $1] if $target =~ /\G (; \n* | \n+)/gcx;
-            redo TOKEN if $target =~ /\G \s+/gcx;
-            return ['unknown', $1] if $target =~ /\G (.)/gcx;
-            return;
+    my ($input, $label, $pattern) = @_;
+    my @tokens;
+    my ($buf, $finished) = ("");
+    my $split = sub { split /($pattern)/, $_[0] };
+    my $maketoken = sub { [$label, $_[0] ]};
+    sub {
+        while (@tokens == 0 && ! $finished) {
+            my $i = $input->();
+            if (ref $i) {
+                my ($sep, $tok) = $split->($buf);
+                $tok = $maketoken->($tok) if defined $tok;
+                push @tokens, grep defined && $_ ne "", $sep, $tok, $i;
+                $buf = "";
+            }
+            else {
+                $buf .= $i if defined $i;
+                my @newtoks = $split->($buf);
+                while (@newtoks > 2
+                       || @newtoks && ! defined $i) {
+                    push @tokens, shift(@newtoks);
+                    push @tokens, $maketoken->(shift @newtoks) if @newtoks;
+                }
+                $buf = join "", @newtoks;
+                $finished = 1 if ! defined $i;
+                @tokens = grep $_ ne "", @tokens;
+            }
         }
+        return shift(@tokens);
     }
 }

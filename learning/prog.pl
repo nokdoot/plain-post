@@ -10,15 +10,15 @@ use lib './';
 
 use Lexer qw/ make_charstream records tokens /;
 
-my $str = "a = 12345679 * 6";
+my $stdin = make_charstream(\*STDIN);
 
-my $a = tokens($str);
-say Dumper $a->();
-say Dumper $a->();
-say Dumper $a->();
-say Dumper $a->();
-say Dumper $a->();
+my $a = tokens($stdin, "numeral", qr/\d+/);
 
-__DATA__
----
-
+while ( my $output = $a->() ) {
+    if ( ref $output ) {
+#         say "@$output";
+    }
+    else {
+#         say $output;
+    }
+}

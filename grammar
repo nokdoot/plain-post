@@ -1,71 +1,26 @@
-PODx :  '=podx'
-        EL
-            ...# 뭘 추가해야하지
-        EL
-        '=back'
+LETTER          ->  '.'
 
-STR   : ( FORMAT | LETTER )+
 
-LETTER : .
+                    #ascii 13
+CR              ->  '\xd'
 
-DIGIT  : \d
+                    #ascii 10
+LF              ->  '\xa'
 
-SPACE  : \s+
+#New Line
+NL              ->  CR | LF | CR LF
 
-PARAGRAPH  : STR+
-             END
+LINE            ->  '.*'
+                    NL | EOF
 
-END   : EL | EOF
+SPACE           ->  '\x20'
 
-BREAK : '=break'
-        END
+TAB             ->  '\x9'
 
-HEAD :  '=head1' | '=head2' | '=head3' | '=head4' | '=head5' | '=head6' STR
-        PARAGRAPH
+#Blank Line
+BL              ->  ( LETTER{0} | SPACE | TAB )+
+                    NL
 
-EL   :  '^\s*\n'
+WHITESPACE      ->  ( SPACE+ | TAB+ | NL )
 
-INDENT : '\s+'
 
-LIST :  '=list'
-        EL
-        ( ( ITEM | STEP ) ( INDENT LIST EL )? )+
-        '=back'
-        END
-       
-ITEM :  '=item' STR
-        EL
-        STR
-        ( EL STR )*
-        EL
-
-STEP :  '=step' NUM? STR
-        EL 
-        STR
-        ( EL STR )*
-        EL
-
-OPENFORMAT  : '=' | '<' | '~' | '['
-CLOSEFORMAT : '=' | '>' | '~' | ']'
-
-FORMAT : TEXTFORMAT | LINKFORMAT
-
-TEXTFORMAT : ( u U b B i I l C a )+ OPENFORMAT ( STR | TEXTFORMAT )+ CLOSEFORMAT
-
-ABSURL : 'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
-
-LINKFORMAT : ( l L )+ OPENFORMAT ( STR | TEXTFORMAT )+ CLOSEFORMAT OPENFORMAT ( ABSURL | RELURL )+ CLOSEFORMAT
-
-HTML :  '=html'
-        EL
-        STR
-        EL
-        '=back'
-        END
-
-CODE :  '=code' STR?
-        EL
-        STR
-        EL
-        '=back'
-        END

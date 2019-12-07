@@ -37,19 +37,20 @@ sub records {
 }
 
 sub tokens {
-    my ($input, $label, $pattern) = @_;
+    my ($input, $label, $pattern, $maketoken) = @_;
+    my $maketoken ||= sub { [ $_[1], $_[0] ] };
     my @tokens;
     my ($buf, $finished) = ("");
     my $split = sub { split /($pattern)/, $_[0] };
-    my $maketoken = sub { [$label, $_[0] ]};
     sub {
         while (@tokens == 0 && ! $finished) {
             my $i = $input->();
             if (ref $i) {
                 my ($sep, $tok) = $split->($buf);
-                $tok = $maketoken->($tok) if defined $tok;
+                $tok = $maketoken->($tok, $label) if defined $tok;
                 push @tokens, grep defined && $_ ne "", $sep, $tok, $i;
                 $buf = "";
+                last;
             }
             else {
                 $buf .= $i if defined $i;
@@ -57,7 +58,8 @@ sub tokens {
                 while (@newtoks > 2
                        || @newtoks && ! defined $i) {
                     push @tokens, shift(@newtoks);
-                    push @tokens, $maketoken->(shift @newtoks) if @newtoks;
+                    push @tokens, $maketoken->(shift(@newtoks), $label) 
+                        if @newtoks;
                 }
                 $buf = join "", @newtoks;
                 $finished = 1 if ! defined $i;

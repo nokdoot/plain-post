@@ -1,0 +1,3 @@
+input -> |lexer| -> token -> |parse| -> output
+
+input -> |lexer| -> token

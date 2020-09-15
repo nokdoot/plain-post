@@ -1,11 +1,5 @@
 #!/usr/bin/env perl
 
-=pod
-
-3+5 와 같은 한 자리수 덧셈만 가능한 interpreter
-
-=cut
-
 use strict;
 use warnings;
 use feature qw/ say /;

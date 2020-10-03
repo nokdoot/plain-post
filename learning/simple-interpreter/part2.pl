@@ -7,6 +7,7 @@ use Data::Dumper;
 
 use constant INTEGER => 'INTEGER';
 use constant PLUS => 'PLUS';
+use constant MINUS => 'MINUS';
 use constant EOF => 'EOF';
 
 use Carp;
@@ -31,19 +32,39 @@ package Token {
 package Interpreter {
     sub new {
         my ($class, $text) = @_;
-        my $self = {
+        my $pos = 0;
+        return bless {
             text => $text,
-            pos => 0,
+            pos => $pos,
             current_token => undef
-        };
-        bless $self, $class;
-        return $self;
+            current_char => substr($text, $pos, 1);
+        }, $class;
     }
 
     sub error {
         my $self = shift;
         main::confess "We're outta here!";
-       
+    }
+
+    sub advance {
+        my $self = shift;
+        if ($self->pos > length($self->text) - 1) {
+            $self->current_char = undef;
+        } else {
+            $self->current_char = substr($self->text, $self->pos, 1);
+        }
+    }
+
+    sub skip_whitespace {
+        my $self = shift;
+        while ($self->current_char != undef && $self->current_char =~ m/ /) {
+            $self->advance;
+        }
+    }
+
+    sub integer {
+        my $self = shift;
+
     }
 
     sub get_next_token {

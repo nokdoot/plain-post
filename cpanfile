@@ -1,0 +1,1 @@
+requires 'Mojo::DOM::HTML';

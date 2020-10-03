@@ -5,13 +5,25 @@ use warnings;
 use Data::Dumper;
 use feature qw/ say /;
 
-my @rules = <DATA>;
+sub next_paragraph {
+    local $/ = '\n';
+    my $a = <DATA>;
+    say $a;
+}
 
-say @rules;
+next_paragraph();
 
 __DATA__
-=podx
+한줄a
 
-hello
+두줄
+두줄
 
-=cutx
+세줄
+세줄
+세줄
+
+다시 한줄
+
+다시 두줄
+다시 두줄

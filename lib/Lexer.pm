@@ -3,47 +3,29 @@ package Lexer;
 use strict;
 use warnings;
 
-sub line_stream {
+use constant COMMAND => 'COMMAND';
+use constant WORD => 'WORD';
+use constant SPACE => 'SPACE';
+use constant ERR => 'ERR';
+use constant EOF => 'EOF';
+use constant NEW_LINE => 'NEW_LINE';
+
+sub token_stream {
     my $fh = shift;
-    return sub { return scalar (readline $fh) };
-}
-
-sub read_line {
-    my $fh = shift;
-    return readline $fh;
-}
-
-sub tokenizer {
-    FINDING: {
-        redo FINDING            
-            if $line =~ /\G (s+) /gcx;
-
-        return ['HTML_H1', $1]  
-            if $line =~ /\G (^ =head1 \n* | \n+) /gcx;
-
-        return ['HTML_H2', $1]  
-            if $line =~ /\G (^ =head2 \n* | \n+) /gcx;
-
-        return ['UNKNOWN', $1, pos($line)]   
-            if $line =~ /\G (.*) /gcx; 
-    }
-}
-
-sub next_token {
-    my $fh = shift;
-
-    my $line = '';
-
-    return sub {
-        if (!$line) {
-            $line = read_line($fh);
+    my $line = undef;
+    return sub { 
+        my $pos = pos($line);
+        if (!$line or !$pos or length($line) == $pos) {
+            $line = readline($fh);
         }
-        return $line;
-    };
 
-#     my $line = shift;
-#     return sub {
-#     };
+        return [EOF, undef] if !defined $line;
+        return [NEW_LINE, undef] if $line =~ /\G (\n) /gcx;
+        return [SPACE, $1] if $line =~ /\G (\s+) /gcx;
+        return [COMMAND, $1] if $line =~ /\G (^=) /gcx;
+        return [WORD, $1] if $line =~ /\G ([\p{L}\p{N}]+) /gcxu;
+        return [ERR, $line];
+    }
 }
 
 1;

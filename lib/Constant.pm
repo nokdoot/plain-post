@@ -1,10 +1,15 @@
-package Enum;
+package Constant;
 
-use constant HEAD1 => 'HEAD1';
-use constant HEAD2 => 'HEAD2';
-use constant HEAD3 => 'HEAD3';
-use constant HEAD4 => 'HEAD4';
-use constant HEAD5 => 'HEAD5';
-use constant HEAD6 => 'HEAD6';
-use constant KEYBOARD => 'KEYBOARD';
-use constant UNKNOWN => 'UNKNOWN';
+use strict;
+use warnings;
+
+use Exporter 'import';
+our @EXPORT_OK = qw / COMMAND WORD SPACE ERR EOF NEW_LINE EMPTY_LINE /;
+
+use constant COMMAND => 'COMMAND';
+use constant WORD => 'WORD';
+use constant SPACE => 'SPACE';
+use constant ERR => 'ERR';
+use constant EOF => 'EOF';
+use constant NEW_LINE => 'NEW_LINE';
+use constant EMPTY_LINE => 'EMPTY_LINE';

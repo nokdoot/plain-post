@@ -1,26 +1,36 @@
-LETTER          ->  '.'
+# Non-Terminal
+
+POST : BEGIN (HEAD1)+ END
+
+HEAD1 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION | (EMPTY_LINE HEAD2))*
+
+HEAD2 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION | (EMPTY_LINE HEAD3))*
+
+HEAD3 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION | (EMPTY_LINE HEAD4))*
+
+HEAD4 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION | (EMPTY_LINE HEAD5))*
+
+HEAD5 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION | (EMPTY_LINE HEAD6))*
+
+HEAD6 : COMMAND WORD_HEAD1 SPACE (WORD SPACE*)+ NEWLINE (SECTION)*
+
+SECTION : ((PARAGRAPH | LIST | FIGURE)+ NEWLINE)
+
+PARAGRAPH : ( ( (WORD)+ (NEWLINE) )+ EMPTY_LINE )+
+
+LIST : TODO
 
 
-                    #ascii 13
-CR              ->  '\xd'
-
-                    #ascii 10
-LF              ->  '\xa'
-
-#New Line
-NL              ->  CR | LF | CR LF
-
-LINE            ->  '.*'
-                    NL | EOF
-
-SPACE           ->  '\x20'
-
-TAB             ->  '\x9'
-
-#Blank Line
-BL              ->  ( LETTER{0} | SPACE | TAB )+
-                    NL
-
-WHITESPACE      ->  ( SPACE+ | TAB+ | NL )
 
 
+# Terminal
+
+SPACE : \s+
+
+FIGURE : (IMAGE)
+
+BEGIN : ^=begin
+
+END : ^=end
+
+TODO : 

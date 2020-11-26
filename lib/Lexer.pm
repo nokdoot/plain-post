@@ -3,28 +3,26 @@ package Lexer;
 use strict;
 use warnings;
 
-use constant COMMAND => 'COMMAND';
-use constant WORD => 'WORD';
-use constant SPACE => 'SPACE';
-use constant ERR => 'ERR';
-use constant EOF => 'EOF';
-use constant NEW_LINE => 'NEW_LINE';
+use Constant qw/ SPACE EMPTY_LINE NEW_LINE EOF COMMAND WORD ERR /;
 
 sub token_stream {
     my $fh = shift;
     my $line = undef;
+    my $line_number = 0;
     return sub { 
         my $pos = pos($line);
         if (!$line or !$pos or length($line) == $pos) {
             $line = readline($fh);
+            $line_number++;
         }
 
         return [EOF, undef] if !defined $line;
-        return [NEW_LINE, undef] if $line =~ /\G (\n) /gcx;
+        return [EMPTY_LINE, undef] if $line =~ /\G ^\s*$  /gcx;
+        return [NEW_LINE, $1] if $line =~ /\G (\n) /gcx;
         return [SPACE, $1] if $line =~ /\G (\s+) /gcx;
         return [COMMAND, $1] if $line =~ /\G (^=) /gcx;
-        return [WORD, $1] if $line =~ /\G ([\p{L}\p{N}]+) /gcxu;
-        return [ERR, $line];
+        return [WORD, $1] if $line =~ /\G ([\p{L}\p{N},]+) /gcxu;
+        return [ERR, $line, "line number $line_number", 'at '.($pos+1)];
     }
 }
 
